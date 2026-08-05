@@ -54,9 +54,9 @@ Setiap service di dalam `apps/` adalah aplikasi NestJS independen yang bisa dija
 ## 4. Getting Started
 
 ### Prasyarat
-- Node.js v20+
+- Node.js v24.19.0
 - Docker & Docker Compose
-- npm (package manager)
+- npm (package manager) v11.17.0
 
 ### Langkah Setup
 
