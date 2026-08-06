@@ -1,6 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { TransactionRepository } from './transaction.repository';
 import { TransferRequestDto } from '@ledgerflow/shared-types';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class TransactionService {
@@ -47,6 +48,10 @@ export class TransactionService {
       dto.toAccountId,
       dto.amount,
       dto.idempotencyKey,
+      {
+        eventId: crypto.randomUUID(),
+        version: 1
+      }
     );
 
     return { status: 'CREATED', transaction: newTx };

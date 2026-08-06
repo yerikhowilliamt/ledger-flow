@@ -84,7 +84,7 @@ describe('TransactionService', () => {
 
     const result = await service.processTransfer(dto);
     expect(result).toEqual({ status: 'CREATED', transaction: mockTx });
-    expect(repository.executeAtomicTransfer).toHaveBeenCalledWith('id1', 'id2', 100, 'key');
+    expect(repository.executeAtomicTransfer).toHaveBeenCalledWith('id1', 'id2', 100, 'key', expect.any(Object));
   });
 
   it('should get transaction history', async () => {

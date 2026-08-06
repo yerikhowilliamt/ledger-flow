@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { startContainers, stopContainers } from './setup-containers';
 import { AppModule as TransactionsAppModule } from '../../apps/transactions-service/src/app.module';
-import { PrismaService } from '../../apps/transactions-service/src/common/prisma/prisma.service';
+import { PrismaService } from '../../packages/shared-infra/src/prisma.service';
 
 describe('Idempotency & Outbox Integration (e2e)', () => {
   let app: INestApplication;
@@ -18,6 +18,7 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     
     process.env.DATABASE_URL = dbUrl;
     process.env.RABBITMQ_URL = rmqUrl;
+    process.env.API_KEY = 'ledgerflow-secret-api-key';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TransactionsAppModule],
@@ -73,6 +74,7 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     // 1. Initial request
     const response = await request(app.getHttpServer())
       .post('/transactions')
+      .set('x-api-key', process.env.API_KEY || 'ledgerflow-secret-api-key')
       .send({ ...transferPayload, idempotencyKey });
 
     expect(response.status).toBe(201); // Or whatever success status
@@ -90,6 +92,7 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     // 2. Resend exact same payload -> 200 OK (idempotent)
     const retryResponse = await request(app.getHttpServer())
       .post('/transactions')
+      .set('x-api-key', process.env.API_KEY || 'ledgerflow-secret-api-key')
       .send({ ...transferPayload, idempotencyKey });
 
     expect(retryResponse.status).toBe(200);
@@ -102,6 +105,7 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     // 3. Resend with same key but different payload -> 409 Conflict
     const conflictResponse = await request(app.getHttpServer())
       .post('/transactions')
+      .set('x-api-key', process.env.API_KEY || 'ledgerflow-secret-api-key')
       .send({ ...transferPayload, amount: 20000, idempotencyKey });
 
     expect([409, 500]).toContain(conflictResponse.status);

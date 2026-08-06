@@ -4,13 +4,13 @@ describe('NotificationConsumer', () => {
   let consumer: NotificationConsumer;
   let mockRabbitMQService: any;
   let mockChannelWrapper: any;
-  let consumeCallback: Function;
+  let consumeCallback: (...args: any[]) => any;
 
   beforeEach(() => {
     mockChannelWrapper = {
-      addSetup: jest.fn().mockImplementation(async (cb: Function) => {
+      addSetup: jest.fn().mockImplementation(async (cb: (...args: any[]) => any) => {
         const mockChannel = {
-          consume: jest.fn().mockImplementation((queue: string, callback: Function) => {
+          consume: jest.fn().mockImplementation((queue: string, callback: (...args: any[]) => any) => {
             consumeCallback = callback;
           }),
           ack: jest.fn(),
@@ -45,9 +45,9 @@ describe('NotificationConsumer', () => {
     };
 
     let ackCalled = false;
-    mockChannelWrapper.addSetup.mockImplementation(async (cb: Function) => {
+    mockChannelWrapper.addSetup.mockImplementation(async (cb: (...args: any[]) => any) => {
       const mockChannel = {
-        consume: jest.fn().mockImplementation((queue: string, callback: Function) => {
+        consume: jest.fn().mockImplementation((queue: string, callback: (...args: any[]) => any) => {
           consumeCallback = callback;
         }),
         ack: jest.fn().mockImplementation(() => {

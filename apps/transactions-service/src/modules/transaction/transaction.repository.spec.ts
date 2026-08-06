@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionRepository } from './transaction.repository';
-import { PrismaService } from '../../common/prisma/prisma.service';
+import { PrismaService } from '@ledgerflow/shared-infra';
 import { NotFoundException, HttpException } from '@nestjs/common';
 
 describe('TransactionRepository', () => {
@@ -61,7 +61,7 @@ describe('TransactionRepository', () => {
 
     prisma.$transaction.mockImplementation(async (cb: any) => cb(tx as any));
 
-    const result = await repository.executeAtomicTransfer('id1', 'id2', 100, 'key');
+    const result = await repository.executeAtomicTransfer('id1', 'id2', 100, 'key', { eventId: '123', version: 1 });
 
     expect(result).toEqual({ id: 'tx1' });
     expect(tx.$queryRawUnsafe).toHaveBeenCalled();
@@ -80,7 +80,7 @@ describe('TransactionRepository', () => {
 
     prisma.$transaction.mockImplementation(async (cb: any) => cb(tx as any));
 
-    await expect(repository.executeAtomicTransfer('id1', 'id2', 100, 'key')).rejects.toThrow(NotFoundException);
+    await expect(repository.executeAtomicTransfer('id1', 'id2', 100, 'key', { eventId: '123', version: 1 })).rejects.toThrow(NotFoundException);
   });
 
   it('should fail transfer if insufficient balance', async () => {
@@ -95,7 +95,7 @@ describe('TransactionRepository', () => {
 
     prisma.$transaction.mockImplementation(async (cb: any) => cb(tx as any));
 
-    await expect(repository.executeAtomicTransfer('id1', 'id2', 100, 'key')).rejects.toThrow(HttpException);
+    await expect(repository.executeAtomicTransfer('id1', 'id2', 100, 'key', { eventId: '123', version: 1 })).rejects.toThrow(HttpException);
   });
 
   it('should get account transactions', async () => {

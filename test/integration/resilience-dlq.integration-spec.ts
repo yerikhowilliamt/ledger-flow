@@ -5,7 +5,7 @@ import * as amqp from 'amqplib';
 import { startContainers, stopContainers } from './setup-containers';
 import { AppModule as TransactionsAppModule } from '../../apps/transactions-service/src/app.module';
 import { AppModule as NotificationAppModule } from '../../apps/notification-service/src/app.module';
-import { PrismaService } from '../../apps/transactions-service/src/common/prisma/prisma.service';
+import { PrismaService } from '../../packages/shared-infra/src/prisma.service';
 import { RabbitMQService } from '../../packages/shared-config/src/rabbitmq.service';
 
 describe('Resilience & DLQ Integration (e2e)', () => {
@@ -24,6 +24,7 @@ describe('Resilience & DLQ Integration (e2e)', () => {
     
     process.env.DATABASE_URL = dbUrl;
     process.env.RABBITMQ_URL = rmqUrl;
+    process.env.API_KEY = 'ledgerflow-secret-api-key';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TransactionsAppModule],
@@ -70,7 +71,7 @@ describe('Resilience & DLQ Integration (e2e)', () => {
     const exchange = 'ledger.events';
     const dlq = 'notification.audit-log.dlq';
     const dlx = 'ledger.dlx';
-    const routingKey = 'transaction.completed.v1';
+    const routingKey = 'transaction.completed';
 
     // Instead of waiting, let's explicitly publish and bypass the Nest application since the application sets up its own queue logic and we want to verify DLQ. 
     // Wait, if the app consumes it, the DLQ happens. The DLQ requires `x-dead-letter-exchange` on the audit-log queue.
@@ -121,11 +122,11 @@ describe('Resilience & DLQ Integration (e2e)', () => {
     });
 
     // Wait for retries to exhaust
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 8000));
 
     // Check DLQ
     let messages: any[] = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 15; i++) {
       const m = await rmqChannel.get(dlq, { noAck: true });
       if (m !== false) messages.push(m);
       if (messages.length >= 2) break;

@@ -3,8 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { startContainers, stopContainers } from './setup-containers';
 import { AppModule as TransactionsAppModule } from '../../apps/transactions-service/src/app.module';
-import { AppModule as AccountsAppModule } from '../../apps/accounts-service/src/app.module';
-import { PrismaService } from '../../apps/transactions-service/src/common/prisma/prisma.service';
+import { PrismaService } from '../../packages/shared-infra/src/prisma.service';
 
 import { TerminusModule } from '@nestjs/terminus';
 
@@ -21,6 +20,7 @@ describe('Concurrency Integration (e2e)', () => {
     
     process.env.DATABASE_URL = dbUrl;
     process.env.RABBITMQ_URL = rmqUrl;
+    process.env.API_KEY = 'ledgerflow-secret-api-key';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TransactionsAppModule], // We might need a combined test module if we need both controllers
@@ -76,6 +76,7 @@ describe('Concurrency Integration (e2e)', () => {
     const requests = Array.from({ length: 10 }).map((_, i) =>
       request(app.getHttpServer())
         .post('/transactions')
+        .set('x-api-key', process.env.API_KEY || 'ledgerflow-secret-api-key')
         .send({ ...transferPayload, idempotencyKey: `test-key-concurrent-${i}` })
     );
 

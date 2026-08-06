@@ -1,21 +1,28 @@
-import { Controller, Post, Body, Res, HttpStatus, Get, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { TransactionService } from './transaction.service';
-import { TransferRequestDto } from '@ledgerflow/shared-types';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { createZodDto } from 'nestjs-zod';
+import { transferRequestSchema } from '@ledgerflow/shared-types';
+import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
+import { ApiKeyAuthGuard } from '@ledgerflow/shared-infra';
 
-@ApiTags('Transactions')
+export class TransferRequestDtoClass extends createZodDto(transferRequestSchema) {}
+
+@ApiTags('transactions')
+@ApiSecurity('x-api-key')
+@UseGuards(ApiKeyAuthGuard)
 @Controller()
 export class TransactionsController {
   constructor(private readonly service: TransactionService) {}
 
   @Post('transactions')
-  @ApiOperation({ summary: 'Create a transaction' })
-  @ApiResponse({ status: 201, description: 'Transaction created successfully' })
+  @ApiOperation({ summary: 'Transfer funds between accounts' })
+  @ApiResponse({ status: 201, description: 'Transfer successfully created' })
   @ApiResponse({ status: 200, description: 'Idempotency key reused with identical payload' })
   @ApiResponse({ status: 400, description: 'Bad request or self-transfer' })
   @ApiResponse({ status: 409, description: 'Idempotency key reused with different payload' })
-  async createTransaction(@Body() dto: TransferRequestDto, @Res() res: Response) {
+  @ApiResponse({ status: 422, description: 'Insufficient balance' })
+  async createTransaction(@Body() dto: TransferRequestDtoClass, @Res() res: Response) {
     const { status, transaction } = await this.service.processTransfer(dto);
 
     const fromAccountEntry = transaction.entries.find((e) => e.type === 'DEBIT');
@@ -44,7 +51,7 @@ export class TransactionsController {
 
   @Get('accounts/:id/transactions')
   @ApiOperation({ summary: 'Get account transactions' })
-  @ApiResponse({ status: 200, description: 'Returns list of account transactions' })
+  @ApiResponse({ status: 200, description: 'Returns list of account transaction entries' })
   async getAccountTransactions(
     @Param('id') accountId: string,
     @Query('limit') limitStr?: string,
@@ -68,3 +75,4 @@ export class TransactionsController {
     };
   }
 }
+

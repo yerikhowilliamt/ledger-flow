@@ -1,3 +1,11 @@
+// Fix undici webidl.util.markAsUncloneable in Jest node environment
+try {
+  const undiciWebidl = require('undici/lib/web/fetch/webidl.js');
+  if (undiciWebidl && undiciWebidl.util && !undiciWebidl.util.markAsUncloneable) {
+    undiciWebidl.util.markAsUncloneable = () => {};
+  }
+} catch (e) {}
+
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { RabbitMQContainer, StartedRabbitMQContainer } from '@testcontainers/rabbitmq';
 import { Wait } from 'testcontainers';

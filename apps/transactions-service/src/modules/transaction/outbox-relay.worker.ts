@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../../common/prisma/prisma.service';
+import { PrismaService } from '@ledgerflow/shared-infra';
 import { RabbitMQService } from '@ledgerflow/shared-config';
 import { randomUUID } from 'crypto';
 
