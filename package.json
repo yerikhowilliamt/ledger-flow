@@ -11,7 +11,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "test:integration": "jest --config jest.integration.config.js --runInBand",
+    "test:integration": "NODE_OPTIONS='--no-experimental-fetch' jest --config jest.integration.config.js --runInBand",
     "test:cov": "turbo run test:cov",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
