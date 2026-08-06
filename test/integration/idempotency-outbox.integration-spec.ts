@@ -18,6 +18,7 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     
     process.env.DATABASE_URL = dbUrl;
     process.env.RABBITMQ_URL = rmqUrl;
+    process.env.API_KEY = 'ledgerflow-secret-api-key';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TransactionsAppModule],
