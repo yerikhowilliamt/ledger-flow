@@ -11,5 +11,6 @@ module.exports = {
     '^@ledgerflow/shared-config$': '<rootDir>/packages/shared-config/src',
     '^@ledgerflow/shared-types$': '<rootDir>/packages/shared-types/src',
     '^@ledgerflow/shared-infra$': '<rootDir>/packages/shared-infra/src',
+    '^undici$': '<rootDir>/node_modules/undici',
   },
 };
