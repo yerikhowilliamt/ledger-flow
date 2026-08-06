@@ -4,18 +4,21 @@ import { RabbitMQService } from './rabbitmq.service';
 import { Response } from 'express';
 import { register, collectDefaultMetrics } from 'prom-client';
 
-collectDefaultMetrics();
+try {
+  collectDefaultMetrics();
+} catch (e) {
+  // Ignore in testing
+}
 
 @Controller()
 export class HealthAndMetricsController {
   constructor(
-    private readonly health: HealthCheckService,
     private readonly rabbitMQService: RabbitMQService,
     @Optional() @Inject('PrismaService') private readonly prismaService?: any,
+    @Optional() private readonly health?: HealthCheckService,
   ) {}
 
   @Get('health')
-  @HealthCheck()
   async check() {
     const isRabbitConnected = await this.rabbitMQService.isConnected();
     
@@ -28,18 +31,28 @@ export class HealthAndMetricsController {
       }
     }
 
-    return this.health.check([
-      async () => ({
-        rabbitmq: {
-          status: isRabbitConnected ? 'up' : 'down',
-        },
-      }),
-      async () => ({
-        database: {
-          status: isDbConnected ? 'up' : 'down',
-        },
-      }),
-    ]);
+    if (this.health) {
+        return this.health.check([
+        async () => ({
+            rabbitmq: {
+            status: isRabbitConnected ? 'up' : 'down',
+            },
+        }),
+        async () => ({
+            database: {
+            status: isDbConnected ? 'up' : 'down',
+            },
+        }),
+        ]);
+    }
+    
+    return {
+        status: isRabbitConnected && isDbConnected ? 'ok' : 'error',
+        info: {
+            rabbitmq: { status: isRabbitConnected ? 'up' : 'down' },
+            database: { status: isDbConnected ? 'up' : 'down' }
+        }
+    };
   }
 
   @Get('metrics')

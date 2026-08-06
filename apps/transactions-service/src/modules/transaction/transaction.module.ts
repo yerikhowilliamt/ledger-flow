@@ -5,11 +5,12 @@ import { TransactionRepository } from './transaction.repository';
 import { OutboxRelayWorker } from './outbox-relay.worker';
 import { PrismaModule } from '../../common/prisma/prisma.module';
 import { RabbitMQService } from '@ledgerflow/shared-config';
+import { ReconciliationService } from './reconciliation.service';
 
 @Module({
   imports: [PrismaModule],
   controllers: [TransactionsController],
-  providers: [TransactionService, TransactionRepository, OutboxRelayWorker, RabbitMQService],
+  providers: [TransactionService, TransactionRepository, OutboxRelayWorker, RabbitMQService, ReconciliationService],
 })
 export class TransactionModule {}
 

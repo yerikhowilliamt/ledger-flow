@@ -21,8 +21,8 @@ describe('TransactionsController', () => {
       ],
     }).compile();
 
-    controller = module.get<TransactionsController>(TransactionsController);
-    service = module.get(TransactionService);
+    controller = (module as any).get(TransactionsController);
+    service = (module as any).get(TransactionService);
   });
 
   it('should return 201 for created transaction', async () => {
