@@ -3,14 +3,16 @@ import { AppModule } from './app.module';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { validateEnv } from '@ledgerflow/shared-config';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
   const env = validateEnv();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
   app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalFilters(new GlobalExceptionFilter());
   const port = env.PORT || 3002;
   await app.listen(port);
-  console.log(`transactions-service running on port ${port}`);
 }
 bootstrap();
+

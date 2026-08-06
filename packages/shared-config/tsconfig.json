@@ -5,8 +5,11 @@
     "target": "ES2021",
     "outDir": "./dist",
     "rootDir": "./src",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "strict": true
   },
   "include": ["src/**/*"]
 }
+
