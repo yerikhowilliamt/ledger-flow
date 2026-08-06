@@ -1,12 +1,15 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 import { createZodDto } from 'nestjs-zod';
 import { createAccountSchema } from '@ledgerflow/shared-types';
+import { ApiKeyAuthGuard } from '@ledgerflow/shared-infra';
 import { AccountService } from './account.service';
 
 export class CreateAccountDtoClass extends createZodDto(createAccountSchema) {}
 
 @ApiTags('accounts')
+@ApiSecurity('x-api-key')
+@UseGuards(ApiKeyAuthGuard)
 @Controller('accounts')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
@@ -28,7 +31,7 @@ export class AccountController {
         accountNumber: account.accountNumber,
         name: account.name,
         email: account.email,
-        balance: Number(account.balance),
+        balance: account.balance.toString(),
         status: account.status,
         createdAt: account.createdAt,
         updatedAt: account.updatedAt,
@@ -49,7 +52,7 @@ export class AccountController {
         accountNumber: account.accountNumber,
         name: account.name,
         email: account.email,
-        balance: Number(account.balance),
+        balance: account.balance.toString(),
         status: account.status,
         createdAt: account.createdAt,
         updatedAt: account.updatedAt,
@@ -67,7 +70,7 @@ export class AccountController {
     return {
       data: {
         accountId: result.accountId,
-        balance: Number(result.balance),
+        balance: result.balance.toString(),
         updatedAt: result.updatedAt,
       },
       meta: null,

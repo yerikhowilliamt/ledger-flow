@@ -61,7 +61,7 @@ describe('AccountController', () => {
           accountNumber: mockAccount.accountNumber,
           name: mockAccount.name,
           email: mockAccount.email,
-          balance: 100, // Number conversion check
+          balance: '100', // String conversion check
           status: mockAccount.status,
           createdAt: mockDate,
           updatedAt: mockDate,
@@ -81,7 +81,7 @@ describe('AccountController', () => {
           accountNumber: mockAccount.accountNumber,
           name: mockAccount.name,
           email: mockAccount.email,
-          balance: 100, // Number conversion check
+          balance: '100', // String conversion check
           status: mockAccount.status,
           createdAt: mockDate,
           updatedAt: mockDate,
@@ -98,7 +98,7 @@ describe('AccountController', () => {
       expect(result).toEqual({
         data: {
           accountId: mockAccount.id,
-          balance: 100, // Number conversion check
+          balance: '100', // String conversion check
           updatedAt: mockDate,
         },
         meta: null,

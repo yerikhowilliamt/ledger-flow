@@ -1,13 +1,16 @@
-import { Controller, Post, Body, Res, HttpStatus, Get, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { TransactionService } from './transaction.service';
 import { createZodDto } from 'nestjs-zod';
 import { transferRequestSchema } from '@ledgerflow/shared-types';
-import { ApiTags, ApiOperation, ApiResponse, ApiProperty } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
+import { ApiKeyAuthGuard } from '@ledgerflow/shared-infra';
 
 export class TransferRequestDtoClass extends createZodDto(transferRequestSchema) {}
 
 @ApiTags('transactions')
+@ApiSecurity('x-api-key')
+@UseGuards(ApiKeyAuthGuard)
 @Controller()
 export class TransactionsController {
   constructor(private readonly service: TransactionService) {}

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../../common/prisma/prisma.service';
+import { PrismaService } from '@ledgerflow/shared-infra';
 
 @Injectable()
 export class TransactionRepository {
@@ -12,7 +12,7 @@ export class TransactionRepository {
     });
   }
 
-  async executeAtomicTransfer(fromAccountId: string, toAccountId: string, amount: number, idempotencyKey: string) {
+  async executeAtomicTransfer(fromAccountId: string, toAccountId: string, amount: number, idempotencyKey: string, outboxData: { eventId: string, version: number }) {
     const [id1, id2] = [fromAccountId, toAccountId].sort();
 
     return this.prisma.$transaction(async (tx) => {
@@ -61,6 +61,8 @@ export class TransactionRepository {
           aggregateId: transaction.id,
           eventType: 'transaction.completed',
           payload: {
+            eventId: outboxData.eventId,
+            version: outboxData.version,
             transactionId: transaction.id,
             fromAccountId,
             toAccountId,
