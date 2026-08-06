@@ -12,5 +12,4 @@ module.exports = {
     '^@ledgerflow/shared-types$': '<rootDir>/packages/shared-types/src',
     '^@ledgerflow/shared-infra$': '<rootDir>/packages/shared-infra/src',
   },
-  setupFiles: ['<rootDir>/jest.integration.setup.js'],
 };

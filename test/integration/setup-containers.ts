@@ -1,3 +1,16 @@
+// Polyfill/Fix for undici in Node 20 / Jest environment
+if (typeof global.fetch === 'undefined' || typeof (global as any).CacheStorage === 'undefined') {
+  try {
+    const undici = require('undici');
+    if (!global.fetch) global.fetch = undici.fetch;
+    if (!global.Headers) global.Headers = undici.Headers;
+    if (!global.Request) global.Request = undici.Request;
+    if (!global.Response) global.Response = undici.Response;
+  } catch (e) {
+    // ignore
+  }
+}
+
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { RabbitMQContainer, StartedRabbitMQContainer } from '@testcontainers/rabbitmq';
 import { Wait } from 'testcontainers';
