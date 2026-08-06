@@ -71,7 +71,7 @@ describe('Resilience & DLQ Integration (e2e)', () => {
     const exchange = 'ledger.events';
     const dlq = 'notification.audit-log.dlq';
     const dlx = 'ledger.dlx';
-    const routingKey = 'transaction.completed.v1';
+    const routingKey = 'transaction.completed';
 
     // Instead of waiting, let's explicitly publish and bypass the Nest application since the application sets up its own queue logic and we want to verify DLQ. 
     // Wait, if the app consumes it, the DLQ happens. The DLQ requires `x-dead-letter-exchange` on the audit-log queue.
