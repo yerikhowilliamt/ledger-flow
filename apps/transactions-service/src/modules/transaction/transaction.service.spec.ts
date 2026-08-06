@@ -22,8 +22,8 @@ describe('TransactionService', () => {
       ],
     }).compile();
 
-    service = module.get<TransactionService>(TransactionService);
-    repository = module.get(TransactionRepository);
+    service = (module as any).get(TransactionService);
+    repository = (module as any).get(TransactionRepository);
   });
 
   it('should prevent self-transfer', async () => {
@@ -46,6 +46,30 @@ describe('TransactionService', () => {
     );
   });
 
+  it('should fail with INSUFFICIENT_BALANCE if transfer throws', async () => {
+    const dto = {
+      fromAccountId: 'id1',
+      toAccountId: 'id2',
+      amount: 100,
+      idempotencyKey: 'key',
+    };
+
+    repository.findIdempotencyKey.mockResolvedValue(null);
+    repository.executeAtomicTransfer.mockRejectedValue(
+      new HttpException(
+        { error: 'INSUFFICIENT_BALANCE', message: 'Insufficient balance' },
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      ),
+    );
+
+    await expect(service.processTransfer(dto)).rejects.toThrow(
+      new HttpException(
+        { error: 'INSUFFICIENT_BALANCE', message: 'Insufficient balance' },
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      ),
+    );
+  });
+
   it('should process new transfer', async () => {
     const dto = {
       fromAccountId: 'id1',
@@ -61,6 +85,15 @@ describe('TransactionService', () => {
     const result = await service.processTransfer(dto);
     expect(result).toEqual({ status: 'CREATED', transaction: mockTx });
     expect(repository.executeAtomicTransfer).toHaveBeenCalledWith('id1', 'id2', 100, 'key');
+  });
+
+  it('should get transaction history', async () => {
+    const mockTx = [{ id: 'tx1', amount: BigInt(100), entries: [] }];
+    repository.getAccountTransactions.mockResolvedValue(mockTx as any);
+
+    const result = await service.getAccountTransactions('id1', 10, 'cursor123');
+    expect(repository.getAccountTransactions).toHaveBeenCalledWith('id1', 10, 'cursor123');
+    expect(result).toEqual(mockTx);
   });
 
   it('should reuse idempotency key if payload matches', async () => {

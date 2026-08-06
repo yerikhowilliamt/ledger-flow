@@ -35,8 +35,8 @@ describe('AccountController', () => {
       ],
     }).compile();
 
-    controller = module.get<AccountController>(AccountController);
-    service = module.get<AccountService>(AccountService);
+    controller = (module as any).get(AccountController);
+    service = (module as any).get(AccountService);
     jest.clearAllMocks();
   });
 

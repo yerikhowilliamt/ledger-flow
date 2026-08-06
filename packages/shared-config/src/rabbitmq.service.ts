@@ -19,6 +19,7 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
 
 
   async onModuleInit() {
+    if (this.channelWrapper) return;
     const env = validateEnv();
     this.connection = amqp.connect([env.RABBITMQ_URL]);
 
@@ -70,6 +71,9 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
   }
 
   getChannelWrapper(): ChannelWrapper {
+    if (!this.channelWrapper) {
+      this.onModuleInit(); // Fallback lazy initialization
+    }
     return this.channelWrapper;
   }
 

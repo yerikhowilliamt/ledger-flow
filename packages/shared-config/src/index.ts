@@ -28,6 +28,8 @@ export * from './rabbitmq.service';
 export * from './correlation-id.middleware';
 export * from './health-metrics.controller';
 
+export * from './rate-limiter.module';
+
 
 
 

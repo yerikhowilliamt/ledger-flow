@@ -2,8 +2,8 @@ import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 import { TerminusModule } from '@nestjs/terminus';
 import { AccountModule } from './modules/account/account.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { CorrelationIdMiddleware, HealthAndMetricsController, RabbitMQService } from '@ledgerflow/shared-config';
+import { PrismaModule } from '@ledgerflow/shared-infra';
+import { CorrelationIdMiddleware, HealthAndMetricsController, RateLimiterModule } from '@ledgerflow/shared-config';
 
 @Module({
   imports: [
@@ -15,9 +15,10 @@ import { CorrelationIdMiddleware, HealthAndMetricsController, RabbitMQService } 
     TerminusModule,
     PrismaModule,
     AccountModule,
+    RateLimiterModule,
   ],
   controllers: [HealthAndMetricsController],
-  providers: [RabbitMQService],
+  providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

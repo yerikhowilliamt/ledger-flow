@@ -3,6 +3,8 @@ import { RabbitMQService, RABBITMQ_CONSTANTS } from '@ledgerflow/shared-config';
 import { domainEventSchema } from '@ledgerflow/shared-types';
 import { ConsumeMessage } from 'amqplib';
 
+const MAX_RETRY_COUNT = 3;
+
 @Injectable()
 export class NotificationConsumer implements OnModuleInit {
   private readonly logger = new Logger(NotificationConsumer.name);
@@ -28,9 +30,8 @@ export class NotificationConsumer implements OnModuleInit {
             if (!parsedEvent.success) {
               this.logger.error(
                 `[correlationId=${correlationId}] Schema validation failed for event. Moving to DLQ.`,
-                parsedEvent.error.format(),
               );
-              // Reject without requeue -> sends automatically to DLQ
+              // Reject without requeue → sends automatically to DLQ via broker's dead-letter-exchange
               channel.nack(msg, false, false);
               return;
             }
@@ -38,29 +39,21 @@ export class NotificationConsumer implements OnModuleInit {
             const event = parsedEvent.data;
 
             this.logger.log(
-              `[correlationId=${correlationId}] Audit log recorded for ${event.eventType} (Event ID: ${event.eventId})`,
-              JSON.stringify({
-                eventId: event.eventId,
-                eventType: event.eventType,
-                occurredAt: event.occurredAt,
-                correlationId,
-              }),
+              `Audit log recorded for ${event.eventType} (Event ID: ${event.eventId})`,
+              { correlationId, eventId: event.eventId, eventType: event.eventType, occurredAt: event.occurredAt },
             );
 
             // Acknowledge message
             channel.ack(msg);
           } catch (error: any) {
-
             this.logger.warn(
-              `[correlationId=${correlationId}] Failed processing message. Current retryCount=${retryCount}. Error: ${error?.message || error}`,
+              `Failed processing message. retryCount=${retryCount}. Error: ${error?.message || error}`,
+              { correlationId },
             );
 
-
-            if (retryCount < 3) {
-              // Re-publish or requeue with incremented retry count header
-              const nextRetryCount = retryCount + 1;
+            if (retryCount < MAX_RETRY_COUNT) {
+              // Ack current message and re-publish with incremented retry count
               channel.ack(msg);
-
               await channel.publish(
                 RABBITMQ_CONSTANTS.EXCHANGE_EVENTS,
                 msg.fields.routingKey,
@@ -69,15 +62,16 @@ export class NotificationConsumer implements OnModuleInit {
                   ...msg.properties,
                   headers: {
                     ...msg.properties.headers,
-                    'x-retry-count': nextRetryCount,
+                    'x-retry-count': retryCount + 1,
                   },
                 },
               );
             } else {
               this.logger.error(
-                `[correlationId=${correlationId}] Max retries (${retryCount}) reached. Rejecting to DLQ.`,
+                `Max retries (${MAX_RETRY_COUNT}) reached. Rejecting to DLQ.`,
+                { correlationId },
               );
-              // Reject without requeue -> sends to DLQ
+              // Reject without requeue → sends to DLQ
               channel.nack(msg, false, false);
             }
           }
@@ -87,4 +81,3 @@ export class NotificationConsumer implements OnModuleInit {
     });
   }
 }
-

@@ -34,8 +34,8 @@ describe('AccountService', () => {
       ],
     }).compile();
 
-    service = module.get<AccountService>(AccountService);
-    repository = module.get<AccountRepository>(AccountRepository);
+    service = (module as any).get(AccountService);
+    repository = (module as any).get(AccountRepository);
     jest.clearAllMocks();
   });
 
@@ -44,11 +44,12 @@ describe('AccountService', () => {
   });
 
   describe('createAccount', () => {
-    it('should create an account', async () => {
+    it('should create an account with 0 balance', async () => {
       const data = { name: 'Test', email: 'test@example.com' };
       const result = await service.createAccount(data);
       expect(repository.createAccount).toHaveBeenCalledWith(data);
       expect(result).toEqual(mockAccount);
+      expect(result.balance).toBe(0);
     });
   });
 

@@ -4,7 +4,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { TerminusModule } from '@nestjs/terminus';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { PrismaModule } from './common/prisma/prisma.module';
-import { CorrelationIdMiddleware, HealthAndMetricsController, RabbitMQService } from '@ledgerflow/shared-config';
+import { CorrelationIdMiddleware, HealthAndMetricsController, RabbitMQService, RateLimiterModule } from '@ledgerflow/shared-config';
 
 @Module({
   imports: [
@@ -17,6 +17,7 @@ import { CorrelationIdMiddleware, HealthAndMetricsController, RabbitMQService } 
     TerminusModule,
     PrismaModule,
     TransactionModule,
+    RateLimiterModule,
   ],
   controllers: [HealthAndMetricsController],
   providers: [RabbitMQService],

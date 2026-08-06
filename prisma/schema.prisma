@@ -63,8 +63,11 @@ model TransactionEntry {
   type          EntryType
   amount        BigInt
   createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   account       Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, createdAt])
 
   @@map("transaction_entries")
 }
@@ -78,6 +81,8 @@ model OutboxEvent {
   status        OutboxStatus @default(PENDING)
   createdAt     DateTime     @default(now()) @map("created_at")
   processedAt   DateTime?    @map("processed_at")
+
+  @@index([status, createdAt])
 
   @@map("outbox_events")
 }
