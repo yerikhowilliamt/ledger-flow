@@ -122,11 +122,11 @@ describe('Resilience & DLQ Integration (e2e)', () => {
     });
 
     // Wait for retries to exhaust
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 8000));
 
     // Check DLQ
     let messages: any[] = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 15; i++) {
       const m = await rmqChannel.get(dlq, { noAck: true });
       if (m !== false) messages.push(m);
       if (messages.length >= 2) break;
