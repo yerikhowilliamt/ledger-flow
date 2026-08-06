@@ -1,0 +1,32 @@
+{
+  "name": "ledger-flow",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "test:cov": "turbo run test:cov",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
+  },
+  "devDependencies": {
+    "@nestjs/swagger": "^11.4.6",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.4.2",
+    "prisma": "^5.22.0",
+    "swagger-ui-express": "^5.0.1",
+    "ts-jest": "^29.4.12",
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  }
+}
