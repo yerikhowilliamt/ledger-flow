@@ -75,6 +75,7 @@ describe('Concurrency Integration (e2e)', () => {
     const requests = Array.from({ length: 10 }).map((_, i) =>
       request(app.getHttpServer())
         .post('/transactions')
+        .set('x-api-key', process.env.API_KEY || 'ledgerflow-secret-api-key')
         .send({ ...transferPayload, idempotencyKey: `test-key-concurrent-${i}` })
     );
 

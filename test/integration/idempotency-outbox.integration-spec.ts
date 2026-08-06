@@ -73,6 +73,7 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     // 1. Initial request
     const response = await request(app.getHttpServer())
       .post('/transactions')
+      .set('x-api-key', process.env.API_KEY || 'ledgerflow-secret-api-key')
       .send({ ...transferPayload, idempotencyKey });
 
     expect(response.status).toBe(201); // Or whatever success status
@@ -90,6 +91,7 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     // 2. Resend exact same payload -> 200 OK (idempotent)
     const retryResponse = await request(app.getHttpServer())
       .post('/transactions')
+      .set('x-api-key', process.env.API_KEY || 'ledgerflow-secret-api-key')
       .send({ ...transferPayload, idempotencyKey });
 
     expect(retryResponse.status).toBe(200);
@@ -102,6 +104,7 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     // 3. Resend with same key but different payload -> 409 Conflict
     const conflictResponse = await request(app.getHttpServer())
       .post('/transactions')
+      .set('x-api-key', process.env.API_KEY || 'ledgerflow-secret-api-key')
       .send({ ...transferPayload, amount: 20000, idempotencyKey });
 
     expect([409, 500]).toContain(conflictResponse.status);
