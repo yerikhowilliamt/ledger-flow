@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { startContainers, stopContainers } from './setup-containers';
 import { AppModule as TransactionsAppModule } from '../../apps/transactions-service/src/app.module';
 import { AppModule as AccountsAppModule } from '../../apps/accounts-service/src/app.module';
-import { PrismaService } from '../../apps/transactions-service/src/common/prisma/prisma.service';
+import { PrismaService } from '@ledgerflow/shared-infra';
 
 import { TerminusModule } from '@nestjs/terminus';
 

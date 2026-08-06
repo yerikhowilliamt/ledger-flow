@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { startContainers, stopContainers } from './setup-containers';
 import { AppModule as TransactionsAppModule } from '../../apps/transactions-service/src/app.module';
-import { PrismaService } from '../../apps/transactions-service/src/common/prisma/prisma.service';
+import { PrismaService } from '@ledgerflow/shared-infra';
 
 describe('Idempotency & Outbox Integration (e2e)', () => {
   let app: INestApplication;

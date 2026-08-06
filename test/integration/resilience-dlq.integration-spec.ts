@@ -5,7 +5,7 @@ import * as amqp from 'amqplib';
 import { startContainers, stopContainers } from './setup-containers';
 import { AppModule as TransactionsAppModule } from '../../apps/transactions-service/src/app.module';
 import { AppModule as NotificationAppModule } from '../../apps/notification-service/src/app.module';
-import { PrismaService } from '../../apps/transactions-service/src/common/prisma/prisma.service';
+import { PrismaService } from '@ledgerflow/shared-infra';
 import { RabbitMQService } from '../../packages/shared-config/src/rabbitmq.service';
 
 describe('Resilience & DLQ Integration (e2e)', () => {
