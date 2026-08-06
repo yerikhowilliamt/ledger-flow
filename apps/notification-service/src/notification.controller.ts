@@ -7,3 +7,5 @@ export class NotificationController {
     return { status: 'ok', service: 'notification-service' };
   }
 }
+
+

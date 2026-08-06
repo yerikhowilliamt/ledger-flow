@@ -23,3 +23,11 @@ export function validateEnv(env: Record<string, unknown> = process.env): EnvConf
   }
   return result.data;
 }
+
+export * from './rabbitmq.service';
+export * from './correlation-id.middleware';
+export * from './health-metrics.controller';
+
+
+
+
