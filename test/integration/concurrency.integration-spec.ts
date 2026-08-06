@@ -3,8 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { startContainers, stopContainers } from './setup-containers';
 import { AppModule as TransactionsAppModule } from '../../apps/transactions-service/src/app.module';
-import { AppModule as AccountsAppModule } from '../../apps/accounts-service/src/app.module';
-import { PrismaService } from '@ledgerflow/shared-infra';
+import { PrismaService } from '../../packages/shared-infra/src/prisma.service';
 
 import { TerminusModule } from '@nestjs/terminus';
 

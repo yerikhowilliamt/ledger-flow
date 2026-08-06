@@ -11,7 +11,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "test:integration": "NODE_OPTIONS='--no-experimental-fetch' jest --config jest.integration.config.js --runInBand",
+    "test:integration": "jest --config jest.integration.config.js --runInBand",
     "test:cov": "turbo run test:cov",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -42,7 +42,8 @@
     "testcontainers": "^12.1.0",
     "ts-jest": "^29.4.12",
     "turbo": "^2.0.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "undici": "^5.29.0"
   },
   "dependencies": {
     "@nestjs/schedule": "^6.1.3",
