@@ -20,10 +20,9 @@ describe('Concurrency Integration (e2e)', () => {
 
     process.env.DATABASE_URL = dbUrl;
     process.env.RABBITMQ_URL = rmqUrl;
-    process.env.REDIS_HOST = containers.redisHost;
-    process.env.REDIS_PORT = String(containers.redisPort);
     process.env.NODE_ENV = 'production';
     process.env.API_KEYS = 'ledgerflow-secret-api-key';
+    // REDIS_HOST/REDIS_PORT provided by CI services on localhost:6379
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TransactionsAppModule], // We might need a combined test module if we need both controllers
