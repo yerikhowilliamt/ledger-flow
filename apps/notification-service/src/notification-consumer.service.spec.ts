@@ -1,3 +1,15 @@
+jest.mock('@ledgerflow/shared-infra', () => ({
+  ...jest.requireActual('@ledgerflow/shared-infra'),
+  runInExtractedContext: jest.fn((headers, fn) => fn()),
+  getTracer: jest.fn(() => ({
+    startSpan: jest.fn(() => ({
+      setAttributes: jest.fn(),
+      recordException: jest.fn(),
+      end: jest.fn(),
+    })),
+  })),
+}));
+
 import { NotificationConsumer } from './notification-consumer.service';
 
 describe('NotificationConsumer', () => {

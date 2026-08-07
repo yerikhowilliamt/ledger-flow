@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ledgerflow/shared-config": "*",
+    "@ledgerflow/shared-infra": "*",
     "@ledgerflow/shared-types": "*",
     "@nestjs/common": "^10.3.0",
     "@nestjs/core": "^10.3.0",

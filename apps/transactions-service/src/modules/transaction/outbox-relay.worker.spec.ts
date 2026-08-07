@@ -1,3 +1,15 @@
+jest.mock('@ledgerflow/shared-infra', () => ({
+  ...jest.requireActual('@ledgerflow/shared-infra'),
+  injectTraceContext: jest.fn((headers) => ({ ...headers, traceparent: '00-fake-trace-id-00' })),
+  getTracer: jest.fn(() => ({
+    startSpan: jest.fn(() => ({
+      setAttributes: jest.fn(),
+      recordException: jest.fn(),
+      end: jest.fn(),
+    })),
+  })),
+}));
+
 import { OutboxRelayWorker } from './outbox-relay.worker';
 
 describe('OutboxRelayWorker', () => {
