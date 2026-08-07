@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, Reflector } from '@nestjs/core';
 import { ApiKeyGuard } from './api-key.guard';
 
 const host = process.env.REDIS_HOST;
@@ -29,6 +29,7 @@ if (host) {
     }),
   ],
   providers: [
+    Reflector,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
