@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ApiKeyGuard } from '@ledgerflow/shared-config';
 import { TransactionsController } from './transaction.controller';
 import { TransactionService } from './transaction.service';
 import { Response } from 'express';
@@ -19,7 +20,10 @@ describe('TransactionsController', () => {
           },
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(ApiKeyGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = (module as any).get(TransactionsController);
     service = (module as any).get(TransactionService);

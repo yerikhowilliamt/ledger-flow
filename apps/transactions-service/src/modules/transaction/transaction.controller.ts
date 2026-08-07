@@ -4,14 +4,14 @@ import { TransactionService } from './transaction.service';
 import { createZodDto } from 'nestjs-zod';
 import { transferRequestSchema } from '@ledgerflow/shared-types';
 import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
-import { ApiKeyAuthGuard } from '@ledgerflow/shared-infra';
+import { ApiKeyGuard } from '@ledgerflow/shared-config';
 import { Throttle } from '@nestjs/throttler';
 
 export class TransferRequestDtoClass extends createZodDto(transferRequestSchema) {}
 
 @ApiTags('transactions')
 @ApiSecurity('x-api-key')
-@UseGuards(ApiKeyAuthGuard)
+@UseGuards(ApiKeyGuard)
 @Controller()
 export class TransactionsController {
   constructor(private readonly service: TransactionService) {}

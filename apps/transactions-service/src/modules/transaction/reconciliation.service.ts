@@ -56,11 +56,16 @@ export class ReconciliationService {
   }
 
   private async checkZeroSum() {
+    // ponytail: window zero-sum check to avoid full table scan on large ledger (upgrade: table partitioning by month)
+    const windowDays = parseInt(process.env.RECONCILIATION_WINDOW_DAYS || '30', 10);
+    const windowDate = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
+
     const zeroSumResult = await this.prisma.$queryRaw<Array<{ debit_sum: bigint; credit_sum: bigint }>>`
       SELECT
         COALESCE(SUM(CASE WHEN type = 'DEBIT' THEN amount ELSE 0 END), 0) as debit_sum,
         COALESCE(SUM(CASE WHEN type = 'CREDIT' THEN amount ELSE 0 END), 0) as credit_sum
       FROM transaction_entries
+      WHERE created_at >= ${windowDate}
     `;
 
     const { debit_sum: debitSum, credit_sum: creditSum } = zeroSumResult[0] || { debit_sum: 0n, credit_sum: 0n };
