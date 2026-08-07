@@ -31,6 +31,22 @@ enum OutboxStatus {
   FAILED
 }
 
+enum ReconciliationStatus {
+  PASSED
+  FAILED
+}
+
+model ReconciliationReport {
+  id                   String               @id @default(uuid()) @db.Uuid
+  executedAt           DateTime             @default(now()) @map("executed_at")
+  totalAccountsChecked Int                  @map("total_accounts_checked")
+  discrepanciesFound   Int                  @map("discrepancies_found")
+  status               ReconciliationStatus
+  details              Json
+
+  @@map("reconciliation_reports")
+}
+
 model Account {
   id            String             @id @default(uuid()) @db.Uuid
   accountNumber String             @unique @map("account_number")

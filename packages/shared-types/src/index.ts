@@ -48,3 +48,17 @@ export const domainEventSchema = z.object({
 });
 
 export type DomainEventDto = z.infer<typeof domainEventSchema>;
+
+export const reconciliationStatusEnum = z.enum(['PASSED', 'FAILED']);
+export type ReconciliationStatusType = z.infer<typeof reconciliationStatusEnum>;
+
+export const reconciliationReportSchema = z.object({
+  id: z.string().uuid(),
+  executedAt: z.string().or(z.date()),
+  totalAccountsChecked: z.number().int().nonnegative(),
+  discrepanciesFound: z.number().int().nonnegative(),
+  status: reconciliationStatusEnum,
+  details: z.record(z.unknown()),
+});
+
+export type ReconciliationReportDto = z.infer<typeof reconciliationReportSchema>;
