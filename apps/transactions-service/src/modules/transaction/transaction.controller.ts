@@ -5,6 +5,7 @@ import { createZodDto } from 'nestjs-zod';
 import { transferRequestSchema } from '@ledgerflow/shared-types';
 import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 import { ApiKeyAuthGuard } from '@ledgerflow/shared-infra';
+import { Throttle } from '@nestjs/throttler';
 
 export class TransferRequestDtoClass extends createZodDto(transferRequestSchema) {}
 
@@ -16,6 +17,7 @@ export class TransactionsController {
   constructor(private readonly service: TransactionService) {}
 
   @Post('transactions')
+  @Throttle({ default: { limit: 50, ttl: 60000 } })
   @ApiOperation({ summary: 'Transfer funds between accounts' })
   @ApiResponse({ status: 201, description: 'Transfer successfully created' })
   @ApiResponse({ status: 200, description: 'Idempotency key reused with identical payload' })

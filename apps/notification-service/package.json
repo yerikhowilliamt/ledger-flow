@@ -7,7 +7,7 @@
     "dev": "nest start --watch",
     "start": "nest start",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests --forceExit"
   },
   "dependencies": {
     "@ledgerflow/shared-config": "*",

@@ -3,6 +3,7 @@ import { HealthCheckService, HealthCheck } from '@nestjs/terminus';
 import { RabbitMQService } from './rabbitmq.service';
 import { Response } from 'express';
 import { register, collectDefaultMetrics } from 'prom-client';
+import { SkipAuth } from './skip-auth.decorator';
 
 try {
   collectDefaultMetrics();
@@ -11,6 +12,7 @@ try {
 }
 
 @Controller()
+@SkipAuth()
 export class HealthAndMetricsController {
   constructor(
     private readonly rabbitMQService: RabbitMQService,

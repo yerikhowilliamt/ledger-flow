@@ -33,6 +33,9 @@ export async function startContainers() {
   const dbUrl = pgContainer.getConnectionUri();
   const rmqUrl = rmqContainer.getAmqpUrl();
 
+  // Redis is provided by CI services on localhost:6379 (no Testcontainers needed)
+  // Falls back to in-memory throttling if REDIS_HOST not set
+
   // Run migrations
   await execAsync(`DATABASE_URL=${dbUrl} npx prisma migrate deploy`);
 

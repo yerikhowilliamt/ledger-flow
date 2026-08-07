@@ -7,6 +7,10 @@ export const envSchema = z.object({
   PORT: z.string().or(z.number()).transform((val) => typeof val === 'number' ? val : parseInt(val, 10)).optional(),
   DATABASE_URL: z.string().url('DATABASE_URL must be a valid URL'),
   RABBITMQ_URL: z.string().min(1, 'RABBITMQ_URL is required'),
+  REDIS_HOST: z.string().optional().default('localhost'),
+  REDIS_PORT: z.string().optional().default('6379'),
+  CORS_ORIGINS: z.string().optional(),
+  API_KEYS: z.string().optional(),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
@@ -27,9 +31,7 @@ export function validateEnv(env: Record<string, unknown> = process.env): EnvConf
 export * from './rabbitmq.service';
 export * from './correlation-id.middleware';
 export * from './health-metrics.controller';
-
 export * from './rate-limiter.module';
-
-
-
-
+export * from './throttler-exception.filter';
+export * from './skip-auth.decorator';
+export * from './api-key.guard';

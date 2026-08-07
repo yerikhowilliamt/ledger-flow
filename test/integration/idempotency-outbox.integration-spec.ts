@@ -15,10 +15,12 @@ describe('Idempotency & Outbox Integration (e2e)', () => {
     const containers = await startContainers();
     dbUrl = containers.dbUrl;
     rmqUrl = containers.rmqUrl;
-    
+
     process.env.DATABASE_URL = dbUrl;
     process.env.RABBITMQ_URL = rmqUrl;
+    process.env.NODE_ENV = 'production';
     process.env.API_KEY = 'ledgerflow-secret-api-key';
+    process.env.API_KEYS = 'ledgerflow-secret-api-key';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TransactionsAppModule],
