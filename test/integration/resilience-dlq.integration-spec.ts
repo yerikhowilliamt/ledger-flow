@@ -24,7 +24,10 @@ describe('Resilience & DLQ Integration (e2e)', () => {
     
     process.env.DATABASE_URL = dbUrl;
     process.env.RABBITMQ_URL = rmqUrl;
-    process.env.API_KEY = 'ledgerflow-secret-api-key';
+    process.env.REDIS_HOST = containers.redisHost;
+    process.env.REDIS_PORT = String(containers.redisPort);
+    process.env.NODE_ENV = 'production';
+    process.env.API_KEYS = 'ledgerflow-secret-api-key';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TransactionsAppModule],

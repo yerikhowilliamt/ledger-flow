@@ -8,7 +8,7 @@ try {
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { RabbitMQContainer, StartedRabbitMQContainer } from '@testcontainers/rabbitmq';
-import { Wait } from 'testcontainers';
+import { GenericContainer, StartedTestContainer, Wait } from 'testcontainers';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -16,6 +16,7 @@ const execAsync = promisify(exec);
 
 let pgContainer: StartedPostgreSqlContainer;
 let rmqContainer: StartedRabbitMQContainer;
+let redisContainer: StartedTestContainer;
 
 export async function startContainers() {
   pgContainer = await new PostgreSqlContainer('postgres:16-alpine')
@@ -30,8 +31,15 @@ export async function startContainers() {
     .withWaitStrategy(Wait.forLogMessage(/Server startup complete/))
     .start();
 
+  redisContainer = await new GenericContainer('redis:7-alpine')
+    .withExposedPorts(6379)
+    .withWaitStrategy(Wait.forLogMessage('Ready to accept connections'))
+    .start();
+
   const dbUrl = pgContainer.getConnectionUri();
   const rmqUrl = rmqContainer.getAmqpUrl();
+  const redisHost = redisContainer.getHost();
+  const redisPort = redisContainer.getMappedPort(6379);
 
   // Run migrations
   await execAsync(`DATABASE_URL=${dbUrl} npx prisma migrate deploy`);
@@ -39,6 +47,8 @@ export async function startContainers() {
   return {
     dbUrl,
     rmqUrl,
+    redisHost,
+    redisPort,
   };
 }
 
@@ -48,5 +58,8 @@ export async function stopContainers() {
   }
   if (rmqContainer) {
     await rmqContainer.stop();
+  }
+  if (redisContainer) {
+    await redisContainer.stop();
   }
 }
