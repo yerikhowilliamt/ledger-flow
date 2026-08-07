@@ -3,4 +3,3 @@ export { PrismaService } from './prisma.service';
 export { PrismaModule } from './prisma.module';
 export { setupSwagger } from './swagger';
 export { initTracing, injectTraceContext, runInExtractedContext, getTracer } from './otel';
-export { ApiKeyAuthGuard } from './api-key.guard';

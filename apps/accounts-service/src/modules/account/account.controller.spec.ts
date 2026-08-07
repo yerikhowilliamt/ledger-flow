@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ApiKeyGuard } from '@ledgerflow/shared-config';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 
@@ -33,7 +34,10 @@ describe('AccountController', () => {
           useValue: mockService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(ApiKeyGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = (module as any).get(AccountController);
     service = (module as any).get(AccountService);

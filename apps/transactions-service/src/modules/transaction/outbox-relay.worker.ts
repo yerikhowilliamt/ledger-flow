@@ -8,6 +8,7 @@ import { randomUUID } from 'crypto';
 export class OutboxRelayWorker {
   private readonly logger = new Logger(OutboxRelayWorker.name);
   private isProcessing = false;
+  private idleCount = 0;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -17,6 +18,16 @@ export class OutboxRelayWorker {
   @Cron(CronExpression.EVERY_SECOND)
   async handleOutboxEvents() {
     if (this.isProcessing) return;
+
+    // ponytail: adaptive idle backoff to skip polling when queue is empty (upgrade: PostgreSQL LISTEN/NOTIFY)
+    if (this.idleCount > 0) {
+      // Exponentially backoff up to 10 seconds (skip 10 cycles)
+      const skipFactor = Math.min(this.idleCount, 10);
+      if (Math.random() > 1 / skipFactor) {
+        return;
+      }
+    }
+
     this.isProcessing = true;
 
     try {
@@ -42,9 +53,12 @@ export class OutboxRelayWorker {
 
 
       if (!events || events.length === 0) {
+        this.idleCount++;
         this.isProcessing = false;
         return;
       }
+
+      this.idleCount = 0;
 
       for (const event of events) {
         const span = getTracer('outbox-worker').startSpan('outbox.publish');

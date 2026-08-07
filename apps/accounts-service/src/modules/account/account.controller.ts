@@ -2,14 +2,14 @@ import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 import { createZodDto } from 'nestjs-zod';
 import { createAccountSchema } from '@ledgerflow/shared-types';
-import { ApiKeyAuthGuard } from '@ledgerflow/shared-infra';
+import { ApiKeyGuard } from '@ledgerflow/shared-config';
 import { AccountService } from './account.service';
 
 export class CreateAccountDtoClass extends createZodDto(createAccountSchema) {}
 
 @ApiTags('accounts')
 @ApiSecurity('x-api-key')
-@UseGuards(ApiKeyAuthGuard)
+@UseGuards(ApiKeyGuard)
 @Controller('accounts')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
