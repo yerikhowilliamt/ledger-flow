@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '@ledgerflow/shared-infra';
+import { PrismaService, injectTraceContext, getTracer } from '@ledgerflow/shared-infra';
 import { RabbitMQService } from '@ledgerflow/shared-config';
 import { randomUUID } from 'crypto';
 
@@ -47,6 +47,12 @@ export class OutboxRelayWorker {
       }
 
       for (const event of events) {
+        const span = getTracer('outbox-worker').startSpan('outbox.publish');
+        span.setAttributes({
+          'event.id': event.id,
+          'event.event_type': event.event_type,
+        });
+
         try {
           const payload = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload;
           
@@ -59,11 +65,13 @@ export class OutboxRelayWorker {
           };
 
           const correlationId = payload?.correlationId || randomUUID();
-
-          // 2. Publish to RabbitMQ
-          await this.rabbitMQService.publish(event.event_type, domainEvent, {
+          
+          const headers = injectTraceContext({
             'x-correlation-id': correlationId,
           });
+
+          // 2. Publish to RabbitMQ
+          await this.rabbitMQService.publish(event.event_type, domainEvent, headers);
 
           // 3. Mark as PROCESSED
           await this.prisma.outboxEvent.update({
@@ -75,12 +83,15 @@ export class OutboxRelayWorker {
           });
 
           this.logger.log(`Published outbox event ${event.id} [${event.event_type}]`);
-        } catch (error) {
+        } catch (error: any) {
+          span.recordException(error);
           this.logger.error(`Failed to publish outbox event ${event.id}`, error);
           await this.prisma.outboxEvent.update({
             where: { id: event.id },
             data: { status: 'FAILED' },
           });
+        } finally {
+          span.end();
         }
       }
     } catch (err) {
